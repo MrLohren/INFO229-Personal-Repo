@@ -7,7 +7,7 @@ from slackeventsapi import SlackEventAdapter
 app = Flask(__name__)
 
 slack_event_adapter = SlackEventAdapter(
-    os.environ.get("SIGNING_SECRET"), '/slack/events', app)
+    os.environ.get("SIGNING_SECRET"), '/', app)
 
 # Create a slack client
 slack_web_client = WebClient(token=os.environ.get("SLACK_TOKEN"))
@@ -16,10 +16,22 @@ slack_web_client = WebClient(token=os.environ.get("SLACK_TOKEN"))
 nestor_bot = NestorBot("#private-playground")
 
 # Get the onboarding message payload
-message = nestor_bot.get_message_payload()
+greeting = nestor_bot.get_message_payload()
 
 # Post the onboarding message in Slack
-slack_web_client.chat_postMessage(**message)
+slack_web_client.chat_postMessage(**greeting)
+BOT_API = "U01C83MH5GD"
+
+@slack_event_adapter.on('message')
+def message(payload):
+    event = payload.get('event', {})
+    channel_id = event.get('channel')
+    user_id = event.get('user')
+    text = event.get('text')
+
+    #answer
+    if BOT_API != user_id:
+        slack_web_client.chat_postMessage(channel=channel_id, text=text)
 
 if __name__ == "__main__":
     app.run(debug=True)

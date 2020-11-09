@@ -39,3 +39,7 @@ class NestorBot:
                 *self._choose_message(),
             ],
         }
+    def buscar_en_wikipedia(self, query):
+        #return "pa k quieres saber eso jaja salu2"
+        wikipedia.set_lang("es")
+        return "{}\n\nBusca mas info en: {}".format(wikipedia.summary(query), wikipedia.page(query).url)

@@ -31,7 +31,11 @@ def message(payload):
 
     #answer
     if BOT_API != user_id:
-        slack_web_client.chat_postMessage(channel=channel_id, text=text)
+        if text.lower().startswith("nestor busca: "):
+            w_query = text.lower()[13::]
+            #slack_web_client.chat_postMessage(channel=channel_id, text=w_query)
+            w_response = nestor_bot.buscar_en_wikipedia(w_query)
+            slack_web_client.chat_postMessage(channel=channel_id, text=w_response)
 
 if __name__ == "__main__":
     app.run(debug=True)

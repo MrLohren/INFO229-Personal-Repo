@@ -6,7 +6,7 @@ import wikipedia
 import pageviewapi  
 
 DATABASE="nestor"
-COLLECTION="wikipedia"
+COLLECTION=["greetings", "wikipedia"]
 
 class NestorBot:
 
@@ -20,7 +20,7 @@ class NestorBot:
         #Conexión a MONGO
         myclient = pymongo.MongoClient(host=os.environ['MONGO_HOST'], port=int(os.environ['MONGO_PORT']))
         db = myclient[DATABASE]
-        col = db[COLLECTION]
+        col = db[COLLECTION[0]]
         
         #Consulta hacia la base de datos de citaciones para extraer una muestra aleatoria
         var = [{'$sample':{'size':1}}]
@@ -40,6 +40,32 @@ class NestorBot:
             ],
         }
     def buscar_en_wikipedia(self, query):
-        #return "pa k quieres saber eso jaja salu2"
+        #Conexión a MONGO
+        myclient = pymongo.MongoClient(host=os.environ['MONGO_HOST'], port=int(os.environ['MONGO_PORT']))
+        
+        query = query.strip().lower()
+
+        db = myclient[DATABASE]
+        col = db[COLLECTION[1]]
         wikipedia.set_lang("es")
-        return "{}\n\nBusca mas info en: {}".format(wikipedia.summary(query), wikipedia.page(query).url)
+        #check
+        content = wikipedia.summary(query)
+        query_en_bd = [i for i in col.find({"query" : query})]
+
+        print(query_en_bd)
+        
+        if len(query_en_bd) == 0:
+            #nueva consulta, se ingresa a mongo
+            col.insert_one(
+                {
+                    "query" : query,
+                    "content" : content,
+                    "q_quantity" : 1
+                }
+            )
+        
+        else:
+            col.update_one({"query" : query}, {"$inc" : {"q_quantity" : 1}})
+
+        busqueda = "{}\n\nBusca mas info en: {}".format(content, wikipedia.page(query).url)
+        return busqueda

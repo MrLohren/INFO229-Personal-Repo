@@ -1,0 +1,31 @@
+version: '3.6'  
+services:
+  ngrok:
+    image: wernight/ngrok
+    container_name: ngrok_nestor
+    ports:
+    - "4040:4040"
+    command:
+    - /bin/sh
+    - -c
+    - |
+      ngrok http nestor:5000
+    depends_on:
+    - nestor  
+  nestor:
+    build:
+      context: ./nestor-wikipedia
+    container_name: nestor_slackconnector
+    environment:
+      - MONGO_HOST=database
+    depends_on:
+      - database
+  database:
+    image: mongo
+    container_name: wikipedia_nestor
+    environment:
+      - MONGO_INITDB_DATABASE=nestor
+    volumes:
+      - ./wikidata:/data/db
+    ports:
+      - '27017-27019:27017-27019'

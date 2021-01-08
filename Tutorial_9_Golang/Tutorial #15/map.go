@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	//MAP: Similar a la Logica de los Diccionarios
+	//MAP: Similar (un poco) a la Logica de los Diccionarios
 	//de PYTHON
 	//OJO: map no contempla el orden de los datos
 	//al imprimir, el orden es diferente

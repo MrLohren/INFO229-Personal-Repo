@@ -48,6 +48,8 @@ def callback(ch, method, props, body):
 
         #Ingreso de Mensaje a la tabla del canal
         cur.execute("INSERT INTO {} VALUES({}, {}, {})".format(canalSlack, userName, DATE, message))
+
+        slackdb.commit()
         
     except Error:
         print(Error)
@@ -57,3 +59,5 @@ def callback(ch, method, props, body):
 
 channel.basic_consume(queue='save_on_database', on_message_callback=callback)
 print(' [*] Esperando Mensajes')
+
+channel.start_consuming()
